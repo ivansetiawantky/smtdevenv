@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Modified by Ivan Setiawan
-# 'Last modified: Sun Nov 10 20:54:34 2019.'
+# 'Last modified: Fri Dec 13 17:44:16 2019.'
 #
 # Docker container create:
 # docker run --rm -ti --name mysmtdev \
@@ -70,7 +70,8 @@ COPY ./dot.vimrc /tmp/dot.vimrc
 
 # Below command must be run by the $DOCKER_USER, so put after USER is defined.
 # In case byobu-ctrl-a still cannot work, then put it inside ~/.profile
-RUN echo 'alias ex="exit"' >> /home/$DOCKER_USER/.bashrc && \
+RUN echo 'set -o noclobber' >> /home/$DOCKER_USER/.bashrc && \
+    echo 'alias ex="exit"' >> /home/$DOCKER_USER/.bashrc && \
     echo 'alias rm="rm -i"' >> /home/$DOCKER_USER/.bashrc && \
     echo 'alias cp="cp -i"' >> /home/$DOCKER_USER/.bashrc && \
     echo 'alias mv="mv -i"' >> /home/$DOCKER_USER/.bashrc && \
