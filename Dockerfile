@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 # Modified by Ivan Setiawan
-# 'Last modified: Fri Dec 13 17:44:16 2019.'
+# 'Last modified: Fri Dec 13 23:13:46 2019.'
 #
 # Docker container create:
 # docker run --rm -ti --name mysmtdev \
 # -v $HOME/work/smtdevenv/sharedwks:/home/smtdev/sharedwks \
 # -v $HOME/.ssh:/home/smtdev/.ssh \
-# ivansetiawantky/smtdevenv:2.0 \
+# ivansetiawantky/smtdevenv:2.2 \
 # byobu new
 #
 # Detach: Control p q
@@ -27,7 +27,7 @@ LABEL reference2="Reference for Dockerfile for containerized dev env: https://de
 LABEL reference3="Detailed reference for Dockerfile for containerized dev env: https://github.com/AGhost-7/docker-dev/tree/master/tutorial"
 LABEL maintainer="Ivan Setiawan <j.ivan.setiawan@gmail.com>"
 LABEL vendor="Arcadia, Inc."
-LABEL version="2.0"
+LABEL version="2.2"
 
 ENV DOCKER_USER smtdev
 ENV DEBIAN_FRONTEND noninteractive
