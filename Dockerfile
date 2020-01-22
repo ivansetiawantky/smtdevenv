@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 # Modified by Ivan Setiawan
-# 'Last modified: Fri Dec 13 23:13:46 2019.'
+# 'Last modified: Wed Jan 22 17:17:55 2020.'
 #
 # Docker container create:
 # docker run --rm -ti --name mysmtdev \
 # -v $HOME/work/smtdevenv/sharedwks:/home/smtdev/sharedwks \
 # -v $HOME/.ssh:/home/smtdev/.ssh \
-# ivansetiawantky/smtdevenv:2.2 \
+# ivansetiawantky/smtdevenv:2.3 \
 # byobu new
 #
 # Detach: Control p q
@@ -27,7 +27,7 @@ LABEL reference2="Reference for Dockerfile for containerized dev env: https://de
 LABEL reference3="Detailed reference for Dockerfile for containerized dev env: https://github.com/AGhost-7/docker-dev/tree/master/tutorial"
 LABEL maintainer="Ivan Setiawan <j.ivan.setiawan@gmail.com>"
 LABEL vendor="Arcadia, Inc."
-LABEL version="2.2"
+LABEL version="2.3"
 
 ENV DOCKER_USER smtdev
 ENV DEBIAN_FRONTEND noninteractive
@@ -66,18 +66,20 @@ USER "$DOCKER_USER"
 
 WORKDIR "/home/$DOCKER_USER"
 
-COPY ./dot.vimrc /tmp/dot.vimrc
+# COPY ./dot.vimrc /tmp/dot.vimrc
+COPY ./dot.* /tmp/
 
 # Below command must be run by the $DOCKER_USER, so put after USER is defined.
 # In case byobu-ctrl-a still cannot work, then put it inside ~/.profile
-RUN echo 'set -o noclobber' >> /home/$DOCKER_USER/.bashrc && \
-    echo 'alias ex="exit"' >> /home/$DOCKER_USER/.bashrc && \
-    echo 'alias rm="rm -i"' >> /home/$DOCKER_USER/.bashrc && \
-    echo 'alias cp="cp -i"' >> /home/$DOCKER_USER/.bashrc && \
-    echo 'alias mv="mv -i"' >> /home/$DOCKER_USER/.bashrc && \
+RUN cat /tmp/dot.bashrc-append >> /home/$DOCKER_USER/.bashrc && \
+    # echo 'set -o noclobber' >> /home/$DOCKER_USER/.bashrc && \
     echo '2' | byobu-ctrl-a && \
     cat /tmp/dot.vimrc > /home/$DOCKER_USER/.vimrc && \
-    sudo rm /tmp/dot.vimrc && \
+    cat /tmp/dot.dircolors > /home/$DOCKER_USER/.dircolors && \
+    cat /tmp/dot.svn-prompt.sh > /home/$DOCKER_USER/.svn-prompt.sh && \
+    cat /tmp/dot.git-prompt.sh > /home/$DOCKER_USER/.git-prompt.sh && \
+    cat /tmp/dot.gitconfig > /home/$DOCKER_USER/.gitconfig && \
+    sudo rm /tmp/dot.* && \
     #
     # Below prepare container local directory for moses and clone it.
     mkdir -p /home/$DOCKER_USER/localwks/moses/mosesdecoder && \
@@ -89,9 +91,10 @@ RUN echo 'set -o noclobber' >> /home/$DOCKER_USER/.bashrc && \
     tar xzf /home/$DOCKER_USER/localwks/sample-models.tgz \
     -C /home/$DOCKER_USER/localwks && \
     #
-    # Compile mosesdecoder.
+    # Compile mosesdecoder. RELEASE-4.0
     # Switch directory (cd) to container local directory for mosesdecoder
-    cd /home/$DOCKER_USER/localwks/moses/mosesdecoder && ./bjam && \
+    cd /home/$DOCKER_USER/localwks/moses/mosesdecoder && \
+    git checkout RELEASE-4.0 && ./bjam && \
     #
     # Test the compilation of mosesdecoder. MUST BE RUN IN sample-models dir.
     cd /home/$DOCKER_USER/localwks/sample-models && \
