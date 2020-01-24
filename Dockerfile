@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 # Modified by Ivan Setiawan
-# 'Last modified: Wed Jan 22 17:17:55 2020.'
+# 'Last modified: Sat Jan 25 08:46:27 2020.'
 #
 # Docker container create:
 # docker run (--rm OR --restart=unless-stopped) -ti --name mysmtdev \
 # -v $HOME/work/smtdevenv/sharedwks:/home/smtdev/sharedwks \
 # -v $HOME/.ssh:/home/smtdev/.ssh \
-# ivansetiawantky/smtdevenv:2.4 \
+# ivansetiawantky/smtdevenv:3.0 \
 # byobu new
 #
 # Detach: Control p q
@@ -30,7 +30,7 @@ LABEL reference2="Reference for Dockerfile for containerized dev env: https://de
 LABEL reference3="Detailed reference for Dockerfile for containerized dev env: https://github.com/AGhost-7/docker-dev/tree/master/tutorial"
 LABEL maintainer="Ivan Setiawan <j.ivan.setiawan@gmail.com>"
 LABEL vendor="Arcadia, Inc."
-LABEL version="2.4"
+LABEL version="3.0"
 
 ENV DOCKER_USER smtdev
 ENV DEBIAN_FRONTEND noninteractive
@@ -85,10 +85,11 @@ RUN cat /tmp/dot.bashrc-append >> /home/$DOCKER_USER/.bashrc && \
     cat /tmp/dot.gitconfig > /home/$DOCKER_USER/.gitconfig && \
     sudo rm /tmp/dot.* && \
     #
-    # Below prepare container local directory for moses and clone it.
-    mkdir -p /home/$DOCKER_USER/localwks/moses/mosesdecoder && \
+    # Below prepare container local directory for mosesdecoder and clone it.
+    # Put everything unique to the container directly below ~/localwks.
+    mkdir -p /home/$DOCKER_USER/localwks/mosesdecoder && \
     git clone https://github.com/moses-smt/mosesdecoder.git \
-    /home/$DOCKER_USER/localwks/moses/mosesdecoder && \
+    /home/$DOCKER_USER/localwks/mosesdecoder && \
     # Download sample-models here, to reduce cd by WORKDIR...
     curl -L -o /home/$DOCKER_USER/localwks/sample-models.tgz \
     http://www.statmt.org/moses/download/sample-models.tgz && \
@@ -97,13 +98,13 @@ RUN cat /tmp/dot.bashrc-append >> /home/$DOCKER_USER/.bashrc && \
     #
     # Compile mosesdecoder. RELEASE-4.0
     # Switch directory (cd) to container local directory for mosesdecoder
-    cd /home/$DOCKER_USER/localwks/moses/mosesdecoder && \
+    cd /home/$DOCKER_USER/localwks/mosesdecoder && \
     git checkout RELEASE-4.0 && \
     ./bjam --with-cmph=/usr/lib/x86_64-linux-gnu && \
     #
     # Test the compilation of mosesdecoder. MUST BE RUN IN sample-models dir.
     cd /home/$DOCKER_USER/localwks/sample-models && \
-    /home/$DOCKER_USER/localwks/moses/mosesdecoder/bin/moses \
+    /home/$DOCKER_USER/localwks/mosesdecoder/bin/moses \
     -f phrase-model/moses.ini < phrase-model/in > out
 # Check /home/$DOCKER_USER/localwks/sample-models/out !
 
