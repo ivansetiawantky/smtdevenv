@@ -3,14 +3,17 @@
 # 'Last modified: Wed Jan 22 17:17:55 2020.'
 #
 # Docker container create:
-# docker run --rm -ti --name mysmtdev \
+# docker run (--rm OR --restart=unless-stopped) -ti --name mysmtdev \
 # -v $HOME/work/smtdevenv/sharedwks:/home/smtdev/sharedwks \
 # -v $HOME/.ssh:/home/smtdev/.ssh \
-# ivansetiawantky/smtdevenv:2.3 \
+# ivansetiawantky/smtdevenv:2.4 \
 # byobu new
 #
 # Detach: Control p q
 # Attach: docker container attach mysmtdev
+#
+# docker inspect -f "{{ .HostConfig.RestartPolicy.Name }}" mysmtdev
+# docker update --restart={unless-stopped|always} mysmtdev
 #
 # SSH from inside docker to outside:
 # ssh machine.ext -o ControlPath=/dev/shm/control:%h:%p:%r
@@ -27,7 +30,7 @@ LABEL reference2="Reference for Dockerfile for containerized dev env: https://de
 LABEL reference3="Detailed reference for Dockerfile for containerized dev env: https://github.com/AGhost-7/docker-dev/tree/master/tutorial"
 LABEL maintainer="Ivan Setiawan <j.ivan.setiawan@gmail.com>"
 LABEL vendor="Arcadia, Inc."
-LABEL version="2.3"
+LABEL version="2.4"
 
 ENV DOCKER_USER smtdev
 ENV DEBIAN_FRONTEND noninteractive
@@ -52,6 +55,7 @@ RUN apt-get update && apt-get install -y \
     byobu \
     vim \
     libboost-all-dev \
+    libcmph-dev \
     openssh-client \
     && \
     yes | sudo unminimize && \
@@ -94,7 +98,8 @@ RUN cat /tmp/dot.bashrc-append >> /home/$DOCKER_USER/.bashrc && \
     # Compile mosesdecoder. RELEASE-4.0
     # Switch directory (cd) to container local directory for mosesdecoder
     cd /home/$DOCKER_USER/localwks/moses/mosesdecoder && \
-    git checkout RELEASE-4.0 && ./bjam && \
+    git checkout RELEASE-4.0 && \
+    ./bjam --with-cmph=/usr/lib/x86_64-linux-gnu && \
     #
     # Test the compilation of mosesdecoder. MUST BE RUN IN sample-models dir.
     cd /home/$DOCKER_USER/localwks/sample-models && \
